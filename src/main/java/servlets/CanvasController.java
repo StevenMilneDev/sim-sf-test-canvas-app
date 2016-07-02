@@ -67,14 +67,13 @@ public class CanvasController extends AbstractServlet {
 	private static final long serialVersionUID = 2956510495364791829L;
 
 	@Override
-	protected void service(HttpServletRequest request,
-	        HttpServletResponse response) throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String srString = request.getParameter(SIGNED_REQUEST_PARAM);
 		String authStatus = request.getParameter(SFDC_CANVAS_AUTH);
 		String consumerKey = System.getenv("CANVAS_CONSUMER_KEY");
 
 		request.setAttribute("ua",UserAgent.parse(request.getHeader("User-Agent")));
-		if (null != authStatus && AUTH_STATUS_USER_APPROVAL_REQUIRED.equals(authStatus)){
+		if (authStatus != null && AUTH_STATUS_USER_APPROVAL_REQUIRED.equals(authStatus)){
 			if (null == consumerKey || "".equals(consumerKey.trim())){
 				throw new IllegalStateException("Consumer key is not defined. Did you forget to set your environment variable, CANVAS_CONSUMER_KEY?");
 			}
@@ -82,28 +81,27 @@ public class CanvasController extends AbstractServlet {
 			forward(USER_APPROVAL_RESOURCE, request, response);
 			return;
 		}
+
 		if (!"POST".equals(request.getMethod())) {
 			forward(NO_SIGNED_REQUEST_RESOURCE, request, response);
 			return;
 		}
-		if (null == srString) {
+
+		if (srString == null) {
 			forward(NO_SIGNED_REQUEST_RESOURCE, request, response);
 			return;
 		}
 
-		CanvasRequest cr = SignedRequest.verifyAndDecode(srString,
-		        System.getenv("CANVAS_CONSUMER_SECRET"));
+		CanvasRequest cr = SignedRequest.verifyAndDecode(srString, System.getenv("CANVAS_CONSUMER_SECRET"));
 		request.setAttribute("canvasRequest", cr);
 		request.setAttribute("canvasRequestJson", SignedRequest.toString(cr));
 
-		String resource = String.format("/%s/index.jsp", cr.getContext()
-		        .getEnvironmentContext().getDisplayLocation());
+		String resource = String.format("/%s/index.jsp", cr.getContext().getEnvironmentContext().getDisplayLocation());
 		forward(resource, request, response);
 	}
 	
 	@Override
-	protected void forward(String resource, HttpServletRequest request,
-	        HttpServletResponse response) throws IOException, ServletException {
+	protected void forward(String resource, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		super.forward(resource,DEFAULT_RESOURCE,request,response);
 	}
 }
