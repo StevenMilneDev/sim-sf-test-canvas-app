@@ -30,16 +30,17 @@ import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-public class Main {
+public class Main
+{
 
-	private static final String WEB_ROOT = 'src/main/webapp/';
-	private static final String SSL_STORE = 'keystore';
-	private static final String SSL_PASSWORD = '123456';
+	private static final String WEB_ROOT = "src/main/webapp/";
+	private static final String SSL_STORE = "keystore";
+	private static final String SSL_PASSWORD = "123456";
 
 	//Environment Variable Names
-	private static final String ENV_PORT = 'PORT';
-	private static final String ENV_SSLPORT = 'SSLPORT';
-	private static final String ENV_SSL_PORT = 'SSL_PORT';
+	private static final String ENV_PORT = "PORT";
+	private static final String ENV_SSLPORT = "SSLPORT";
+	private static final String ENV_SSL_PORT = "SSL_PORT";
 	
 	/**
 	 * @description Service entry point
@@ -86,8 +87,8 @@ public class Main {
 	{
 		WebAppContext root = new WebAppContext();
 
-		root.setContextPath('/');
-		root.setDescriptor(WEB_ROOT + '/WEB-INF/web.xml');
+		root.setContextPath("/");
+		root.setDescriptor(WEB_ROOT + "/WEB-INF/web.xml");
 		root.setResourceBase(WEB_ROOT);
 
 		/**
@@ -145,8 +146,8 @@ public class Main {
 	 */
 	private static boolean isRunningOnHeroku ()
 	{
-		String basedir = (String)System.getProperty('basedir');
-		if( basedir != null && basedir.endsWith('/app/target') )
+		String basedir = (String)System.getProperty("basedir");
+		if( basedir != null && basedir.endsWith("/app/target") )
 			return true;
 
 		return false;

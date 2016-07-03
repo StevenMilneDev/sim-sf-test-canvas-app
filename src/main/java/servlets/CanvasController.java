@@ -102,6 +102,6 @@ public class CanvasController extends AbstractServlet {
 	
 	@Override
 	protected void forward(String resource, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		super.forward(resource,DEFAULT_RESOURCE,request,response);
+		super.forward(resource, DEFAULT_RESOURCE, request, response);
 	}
 }
