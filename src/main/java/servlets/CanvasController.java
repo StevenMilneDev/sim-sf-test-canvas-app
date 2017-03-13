@@ -37,9 +37,7 @@ import canvas.SignedRequest;
 
 /**
  * Controller for canvas requests.
- * <p>
- * This class dispatches the request based on where the canvas application is
- * being rendered from.
+ * This class dispatches the request based on where the canvas application is being rendered from.
  */
 public class CanvasController extends AbstractServlet {
 
@@ -68,16 +66,8 @@ public class CanvasController extends AbstractServlet {
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String srString = request.getParameter(SIGNED_REQUEST_PARAM);
-		String authStatus = request.getParameter(SFDC_CANVAS_AUTH);
-		String consumerKey = System.getenv("CANVAS_CONSUMER_KEY");
-
-		request.setAttribute("ua",UserAgent.parse(request.getHeader("User-Agent")));
-		if (authStatus != null && AUTH_STATUS_USER_APPROVAL_REQUIRED.equals(authStatus)){
-			if (null == consumerKey || "".equals(consumerKey.trim())){
-				throw new IllegalStateException("Consumer key is not defined. Did you forget to set your environment variable, CANVAS_CONSUMER_KEY?");
-			}
-			request.setAttribute("consumerKey", consumerKey);
+		request.setAttribute("ua", UserAgent.parse(request.getHeader("User-Agent")));
+		if ( isAuthorizedCanvasRequest(request) ){
 			forward(USER_APPROVAL_RESOURCE, request, response);
 			return;
 		}
@@ -87,6 +77,7 @@ public class CanvasController extends AbstractServlet {
 			return;
 		}
 
+		String srString = request.getParameter(SIGNED_REQUEST_PARAM);
 		if (srString == null) {
 			forward(NO_SIGNED_REQUEST_RESOURCE, request, response);
 			return;
@@ -103,5 +94,22 @@ public class CanvasController extends AbstractServlet {
 	@Override
 	protected void forward(String resource, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		super.forward(resource, DEFAULT_RESOURCE, request, response);
+	}
+
+	private boolean isAuthorizedCanvasRequest(HttpServletRequest request)
+	{
+		String authStatus = request.getParameter(SFDC_CANVAS_AUTH);
+		String consumerKey = System.getenv("CANVAS_CONSUMER_KEY");
+
+		if (authStatus != null && AUTH_STATUS_USER_APPROVAL_REQUIRED.equals(authStatus)){
+			if (consumerKey == null || "".equals(consumerKey.trim())){
+				throw new IllegalStateException("Consumer key is not defined. Did you forget to set your environment variable, CANVAS_CONSUMER_KEY?");
+			}
+
+			request.setAttribute("consumerKey", consumerKey);
+			return true;
+		}
+
+		return false;
 	}
 }
