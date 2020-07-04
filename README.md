@@ -60,6 +60,3 @@ Salesforce Canvas is a mashup framework for consuming third party applications w
 ### How to get Heroku logs
       
       heroku logs --tail
-
-
-
